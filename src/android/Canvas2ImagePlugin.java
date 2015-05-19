@@ -108,6 +108,9 @@ public class Canvas2ImagePlugin extends CordovaPlugin {
             }else {
                 targetFolder = new File(galleryRoot, folder);
             }
+            if(!targetFolder.exists()){
+                targetFolder.mkdir();
+            }
 
             if("".equals(filename)){
                 filename = "c2i_" + date.toString() + ".png";
@@ -137,5 +140,4 @@ public class Canvas2ImagePlugin extends CordovaPlugin {
 	    cordova.getActivity().sendBroadcast(mediaScanIntent);
 	} 
 }
-
 
