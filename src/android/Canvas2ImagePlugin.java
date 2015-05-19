@@ -38,6 +38,9 @@ public class Canvas2ImagePlugin extends CordovaPlugin {
 		if (action.equals(ACTION)) {
 
 			String base64 = data.optString(0);
+            String folder = data.optString(1);
+            String filename = data.optString(2);
+
 			if (base64.equals("")) // isEmpty() requires API level 9
 				callbackContext.error("Missing base64 string");
 			
@@ -50,7 +53,7 @@ public class Canvas2ImagePlugin extends CordovaPlugin {
 			} else {
 				
 				// Save the image
-				File imageFile = savePhoto(bmp);
+				File imageFile = savePhoto(bmp, folder, filename);
 				if (imageFile == null)
 					callbackContext.error("Error while saving image");
 				
@@ -66,7 +69,7 @@ public class Canvas2ImagePlugin extends CordovaPlugin {
 		}
 	}
 
-	private File savePhoto(Bitmap bmp) {
+	private File savePhoto(Bitmap bmp, String folder, String filename) {
 		File retVal = null;
 		
 		try {
@@ -82,24 +85,34 @@ public class Canvas2ImagePlugin extends CordovaPlugin {
 			Log.i("Canvas2ImagePlugin", "Android version " + deviceVersion);
 			int check = deviceVersion.compareTo("2.3.3");
 
-			File folder;
+			File galleryRoot;
 			/*
 			 * File path = Environment.getExternalStoragePublicDirectory(
 			 * Environment.DIRECTORY_PICTURES ); //this throws error in Android
 			 * 2.2
 			 */
 			if (check >= 1) {
-				folder = Environment
+                galleryRoot = Environment
 					.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
 				
-				if(!folder.exists()) {
-					folder.mkdirs();
+				if(!galleryRoot.exists()) {
+                    galleryRoot.mkdirs();
 				}
 			} else {
-				folder = Environment.getExternalStorageDirectory();
+                galleryRoot = Environment.getExternalStorageDirectory();
 			}
-			
-			File imageFile = new File(folder, "c2i_" + date.toString() + ".png");
+
+            File targetFolder;
+            if("".equals(folder)){
+                targetFolder = galleryRoot;
+            }else {
+                targetFolder = new File(galleryRoot, folder);
+            }
+
+            if("".equals(filename)){
+                filename = "c2i_" + date.toString() + ".png";
+            }
+			File imageFile = new File(targetFolder, filename);
 
 			FileOutputStream out = new FileOutputStream(imageFile);
 			bmp.compress(Bitmap.CompressFormat.PNG, 100, out);
@@ -124,3 +137,5 @@ public class Canvas2ImagePlugin extends CordovaPlugin {
 	    cordova.getActivity().sendBroadcast(mediaScanIntent);
 	} 
 }
+
+

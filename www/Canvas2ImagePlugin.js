@@ -24,7 +24,7 @@ module.exports = {
         }
     },
 
-    saveImageDataUrlToLibrary:function(successCallback, failureCallback, dataUrl, mimeType) {
+    saveImageDataUrlToLibrary:function(successCallback, failureCallback, dataUrl, mimeType, folder, filename) {
         // successCallback required
         if (typeof successCallback != "function") {
             console.log("Canvas2ImagePlugin Error: successCallback is not a function");
@@ -34,7 +34,11 @@ module.exports = {
         }
         else {
             var imageData = dataUrl.replace(/data:image\/png;base64,/,'');
-            return cordova.exec(successCallback, failureCallback, "Canvas2ImagePlugin","saveImageDataToLibrary",[imageData]);
+            var params = [];
+            params.push(imageData);
+            params.push(folder || "");
+            params.push(filename || "");
+            return cordova.exec(successCallback, failureCallback, "Canvas2ImagePlugin","saveImageDataToLibrary",params);
         }
     }
 };
